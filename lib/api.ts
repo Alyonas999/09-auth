@@ -11,7 +11,7 @@ axios.defaults.headers.common["Authorization"] = `Bearer ${process.env.NEXT_PUBL
 
 export const fetchNotes = async (
   page: number =1,
-  perPage: number =1,
+  perPage: number =12,
   search?: string
 ): Promise<NotesResponse> => {
   const params: Record<string, string | number> = { page, perPage };

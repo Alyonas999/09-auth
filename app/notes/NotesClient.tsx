@@ -30,7 +30,6 @@ const NotesClient = () => {
   } = useQuery({
     queryKey: ['notes', debouncedQuery, page],
     queryFn: () => fetchNotes(page, perPage, debouncedQuery),
-    keepPreviousData: true,
     enabled: page > 0,
   });
 
