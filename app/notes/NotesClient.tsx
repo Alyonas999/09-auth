@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDebounce, useDebouncedCallback } from 'use-debounce';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import NoteList from '@/components/NoteList/NoteList';
 import Modal from '@/components/Modal/Modal';
 import Pagination from '@/components/Pagination/Pagination';
@@ -19,6 +19,7 @@ const NotesClient = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [showLoader, setShowLoader] = useState<boolean>(false);
+  const perPage = 5; 
 
   const {
     data: notes,
@@ -28,26 +29,25 @@ const NotesClient = () => {
     error,
   } = useQuery({
     queryKey: ['notes', debouncedQuery, page],
-    queryFn: () => fetchNotes(debouncedQuery, page),
-    refetchOnMount: false,
-    placeholderData: keepPreviousData,
-    enabled: !!page,
+    queryFn: () => fetchNotes(page, perPage, debouncedQuery),
+    keepPreviousData: true,
+    enabled: page > 0,
   });
 
+ 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-
     if (isLoading || isFetching) {
       setShowLoader(true);
     } else if (showLoader) {
       timeout = setTimeout(() => setShowLoader(false), 300);
     }
-
     return () => clearTimeout(timeout);
   }, [isLoading, isFetching, showLoader]);
 
-  const totalPages = notes?.totalPages ?? 1;
+  const totalPages = notes?.totalPages ? Math.ceil(notes.totalPages) : 1;
 
+ 
   const onQueryChange = useDebouncedCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPage(1);
@@ -58,13 +58,22 @@ const NotesClient = () => {
 
   const handleClose = () => setIsModalOpen(false);
 
+ 
+  const handlePageChange = (selectedItem: { selected: number }) => {
+    setPage(selectedItem.selected + 1);
+  };
+
   return (
     <div className={css.app}>
       <Toaster />
       <header className={css.toolbar}>
         <SearchBox onChange={onQueryChange} />
         {totalPages > 1 && (
-          <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+          <Pagination
+            pageCount={totalPages}
+            currentPage={page - 1}
+            onPageChange={handlePageChange}
+          />
         )}
         <button className={css.button} onClick={() => setIsModalOpen(true)}>
           Create note +
