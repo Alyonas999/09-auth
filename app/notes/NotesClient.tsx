@@ -75,9 +75,11 @@ const NotesClient = () => {
           />
         </Modal>
       )}
-      {error && (
-        <p className={css.error}>Could not fetch notes. {(error as any)?.message}</p>
-      )}
+     {error && (
+  <p className={css.error}>
+    Could not fetch notes. {(error instanceof Error) ? error.message : 'Unknown error'}
+  </p>
+)}
     </div>
   );
 };
