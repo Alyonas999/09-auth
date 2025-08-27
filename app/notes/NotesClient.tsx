@@ -28,7 +28,7 @@ const NotesClient = () => {
   const { data: notes, isLoading, isFetching, error, isSuccess } = useQuery({
     queryKey: ['notes', query, page],
     queryFn: () => fetchNotes(page, 12, query), 
-    keepPreviousData: true, 
+    // placeholderData: keepPreviousData, 
     staleTime: 1000 * 60,   
     refetchOnWindowFocus: false,
   });
