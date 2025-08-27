@@ -8,7 +8,9 @@ interface SearchBoxProps {
 
 export default function SearchBox({ onSearch }: SearchBoxProps) {
   const updateSearchQuery = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => onSearch(e.target.value),
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onSearch(e.target.value);
+    },
     300
   );
 
@@ -17,7 +19,7 @@ export default function SearchBox({ onSearch }: SearchBoxProps) {
       className={css.input}
       type="text"
       placeholder="Search notes"
-      onChange={updateSearchQuery}
+      onChange={updateSearchQuery.callback}
     />
   );
 }
