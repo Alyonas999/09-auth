@@ -11,6 +11,8 @@ import { fetchNotes } from '@/lib/api';
 import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
 import css from '../notes/NotePage.module.css';
+
+
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -40,6 +42,11 @@ const NotesClient = () => {
   }
   const totalPages = notes?.totalPages ?? 1;
   const handleClose = () => setIsModalOpen(false);
+
+   const debouncedSearch = useDebouncedCallback((value: string) => {
+    setQuery(value);
+    setPage(0); 
+  }, 300);
   return (
     <div className={css.app}>
       <Toaster />
