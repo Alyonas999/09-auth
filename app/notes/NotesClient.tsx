@@ -11,12 +11,13 @@ import { fetchNotes } from '@/lib/api';
 import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
 import css from '../notes/NotePage.module.css';
+
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [showLoader, setShowLoader] = useState<boolean>(false);
-  // Дебаунс поиска, чтобы не дергать API слишком часто
+  
   const onQueryChange = useDebouncedCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPage(1);
@@ -24,15 +25,15 @@ const NotesClient = () => {
     },
     500
   );
-  // React Query для получения заметок
+ 
   const { data: notes, isLoading, isFetching, error, isSuccess } = useQuery({
     queryKey: ['notes', query, page],
-    queryFn: () => fetchNotes(page, 12, query), // perPage=12 по умолчанию
-    keepPreviousData: true, // сохраняем предыдущие данные при смене страницы
-    staleTime: 1000 * 60,   // кеш на 1 минуту
+    queryFn: () => fetchNotes(page, 12, query), 
+    keepPreviousData: true, 
+    staleTime: 1000 * 60,   
     refetchOnWindowFocus: false,
   });
-  // Плавный лоадер
+
   if ((isLoading || isFetching) && !showLoader) {
     setShowLoader(true);
   } else if (!isLoading && !isFetching && showLoader) {
@@ -40,18 +41,26 @@ const NotesClient = () => {
   }
   const totalPages = notes?.totalPages ?? 1;
   const handleClose = () => setIsModalOpen(false);
+
+const errorMessage =
+    error && error instanceof Error ? error.message : 'Unknown error';
+
   return (
     <div className={css.app}>
       <Toaster />
       <header className={css.toolbar}>
-        <SearchBox onChange={onQueryChange} />
+        <SearchBox onSearch={onQueryChange} />
         {totalPages > 1 && (
-          <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+          <Pagination
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage} />
         )}
         <button className={css.button} onClick={() => setIsModalOpen(true)}>
           Create note +
         </button>
       </header>
+
       {showLoader ? (
         <Loading />
       ) : (
@@ -65,6 +74,8 @@ const NotesClient = () => {
           />
         )
       )}
+
+
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm
@@ -75,9 +86,7 @@ const NotesClient = () => {
           />
         </Modal>
       )}
-      {error && (
-        <p className={css.error}>Could not fetch notes. {(error as any)?.message}</p>
-      )}
+      {error && <p className={css.error}>Could not fetch notes. {errorMessage}</p>}
     </div>
   );
 };
