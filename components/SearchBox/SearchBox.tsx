@@ -1,3 +1,4 @@
+'use client';
 import { useDebouncedCallback } from "use-debounce";
 import css from "./SearchBox.module.css";
 
