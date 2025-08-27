@@ -1,7 +1,6 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import { useDebounce, useDebouncedCallback } from 'use-debounce';
+import { useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { useQuery } from '@tanstack/react-query';
 import NoteList from '@/components/NoteList/NoteList';
 import Modal from '@/components/Modal/Modal';
@@ -12,103 +11,74 @@ import { fetchNotes } from '@/lib/api';
 import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
 import css from '../notes/NotePage.module.css';
-
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
-  const [debouncedQuery] = useDebounce(query, 300);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [showLoader, setShowLoader] = useState<boolean>(false);
-  const perPage = 5; 
-
-  const {
-    data: notes,
-    isSuccess,
-    isLoading,
-    isFetching,
-    error,
-  } = useQuery({
-    queryKey: ['notes', debouncedQuery, page],
-    queryFn: () => fetchNotes(page, perPage, debouncedQuery),
-    enabled: page > 0,
-  });
-
- 
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (isLoading || isFetching) {
-      setShowLoader(true);
-    } else if (showLoader) {
-      timeout = setTimeout(() => setShowLoader(false), 300);
-    }
-    return () => clearTimeout(timeout);
-  }, [isLoading, isFetching, showLoader]);
-
-  const totalPages = notes?.totalPages ? Math.ceil(notes.totalPages) : 1;
-
- 
+  // Дебаунс поиска, чтобы не дергать API слишком часто
   const onQueryChange = useDebouncedCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPage(1);
       setQuery(e.target.value);
     },
-    300
+    500
   );
-
+  // React Query для получения заметок
+  const { data: notes, isLoading, isFetching, error, isSuccess } = useQuery({
+    queryKey: ['notes', query, page],
+    queryFn: () => fetchNotes(page, 12, query), // perPage=12 по умолчанию
+    keepPreviousData: true, // сохраняем предыдущие данные при смене страницы
+    staleTime: 1000 * 60,   // кеш на 1 минуту
+    refetchOnWindowFocus: false,
+  });
+  // Плавный лоадер
+  if ((isLoading || isFetching) && !showLoader) {
+    setShowLoader(true);
+  } else if (!isLoading && !isFetching && showLoader) {
+    setTimeout(() => setShowLoader(false), 300);
+  }
+  const totalPages = notes?.totalPages ?? 1;
   const handleClose = () => setIsModalOpen(false);
-
- 
-  const handlePageChange = (selectedItem: { selected: number }) => {
-    setPage(selectedItem.selected + 1);
-  };
-
   return (
     <div className={css.app}>
       <Toaster />
       <header className={css.toolbar}>
         <SearchBox onChange={onQueryChange} />
         {totalPages > 1 && (
-          <Pagination
-            pageCount={totalPages}
-            currentPage={page - 1}
-            onPageChange={handlePageChange}
-          />
+          <Pagination totalPages={totalPages} page={page} setPage={setPage} />
         )}
         <button className={css.button} onClick={() => setIsModalOpen(true)}>
           Create note +
         </button>
       </header>
-
       {showLoader ? (
         <Loading />
       ) : (
         isSuccess &&
         notes && (
           <NoteList
-            query={debouncedQuery}
+            query={query}
             page={page}
             notes={notes.notes}
             isFetching={isFetching}
           />
         )
       )}
-
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm
-            query={debouncedQuery}
+            query={query}
             page={page}
             onSubmit={handleClose}
             onCancel={handleClose}
           />
         </Modal>
       )}
-
       {error && (
-        <p className={css.error}>Could not fetch notes. {error?.message}</p>
+        <p className={css.error}>Could not fetch notes. {(error as any)?.message}</p>
       )}
     </div>
   );
 };
-
 export default NotesClient;
