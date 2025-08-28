@@ -29,7 +29,7 @@ const NotesClient = () => {
     error,
   } = useQuery({
     queryKey: ['notes', query, page],
-    queryFn: () => fetchNotes( 12, query, page),
+    queryFn: () => fetchNotes( page, 12, query ),
     refetchOnMount: false,
     placeholderData: keepPreviousData,
   });
