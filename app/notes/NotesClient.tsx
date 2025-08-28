@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
-import { useQuery } from '@tanstack/react-query';
+
+import { useState, useEffect } from 'react';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import NoteList from '@/components/NoteList/NoteList';
 import Modal from '@/components/Modal/Modal';
 import Pagination from '@/components/Pagination/Pagination';
@@ -10,43 +11,52 @@ import NoteForm from '@/components/NoteForm/NoteForm';
 import { fetchNotes } from '@/lib/api';
 import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
-import css from '../notes/NotePage.module.css';
-
+import css from './NotesPage.module.css';
 
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
+  const [debouncedQuery] = useDebounce(query, 300);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [showLoader, setShowLoader] = useState<boolean>(false);
+
+  const {
+    data: notes,
+    isSuccess,
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery({
+    queryKey: ['notes', debouncedQuery, page],
+    queryFn: () => fetchNotes(debouncedQuery, page),
+    refetchOnMount: false,
+    placeholderData: keepPreviousData,
+  });
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    if (isLoading || isFetching) {
+      setShowLoader(true);
+    } else if (showLoader) {
+      timeout = setTimeout(() => setShowLoader(false), 300);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [isLoading, isFetching, showLoader]);
+
+  const totalPages = notes?.totalPages ?? 1;
 
   const onQueryChange = useDebouncedCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPage(1);
       setQuery(e.target.value);
     },
-    500
+    300
   );
- 
-  const { data: notes, isLoading, isFetching, error, isSuccess } = useQuery({
-    queryKey: ['notes', query, page],
-    queryFn: () => fetchNotes(page, 12, query), 
-    // placeholderData: keepPreviousData, 
-    staleTime: 1000 * 60,   
-    refetchOnWindowFocus: false,
-  });
 
-  if ((isLoading || isFetching) && !showLoader) {
-    setShowLoader(true);
-  } else if (!isLoading && !isFetching && showLoader) {
-    setTimeout(() => setShowLoader(false), 300);
-  }
-  const totalPages = notes?.totalPages ?? 1;
   const handleClose = () => setIsModalOpen(false);
 
-   const debouncedSearch = useDebouncedCallback((value: string) => {
-    setQuery(value);
-    setPage(0); 
-  }, 300);
   return (
     <div className={css.app}>
       <Toaster />
@@ -59,35 +69,37 @@ const NotesClient = () => {
           Create note +
         </button>
       </header>
+
       {showLoader ? (
         <Loading />
       ) : (
         isSuccess &&
         notes && (
           <NoteList
-            query={query}
+            query={debouncedQuery}
             page={page}
             notes={notes.notes}
             isFetching={isFetching}
           />
         )
       )}
+
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm
-            query={query}
+            query={debouncedQuery}
             page={page}
             onSubmit={handleClose}
             onCancel={handleClose}
           />
         </Modal>
       )}
-     {error && (
-  <p className={css.error}>
-    Could not fetch notes. {(error instanceof Error) ? error.message : 'Unknown error'}
-  </p>
-)}
+
+      {error && (
+        <p className={css.error}>Could not fetch notes. {error?.message}</p>
+      )}
     </div>
   );
 };
+
 export default NotesClient;
