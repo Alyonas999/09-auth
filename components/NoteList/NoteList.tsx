@@ -9,6 +9,7 @@ import Link from "next/link";
 
 interface NoteListProps {
   notes: Note[];
+   query: string
 }
 
 export default function NoteList({ notes }: NoteListProps) {
