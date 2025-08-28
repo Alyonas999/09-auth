@@ -11,7 +11,7 @@ import NoteForm from '@/components/NoteForm/NoteForm';
 import { fetchNotes } from '@/lib/api';
 import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
-import css from './NotesPage.module.css';
+import css from '../notes/NotePage.module.css';
 
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
