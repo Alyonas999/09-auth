@@ -78,9 +78,9 @@ const NotesClient = () => {
         notes && (
           <NoteList
             query={debouncedQuery}
-            page={page}
+            
             notes={notes.notes}
-            isFetching={isFetching}
+           
           />
         )
       )}
@@ -88,8 +88,8 @@ const NotesClient = () => {
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm
-            query={debouncedQuery}
-            page={page}
+           
+       
             onSubmit={handleClose}
             onCancel={handleClose}
           />
