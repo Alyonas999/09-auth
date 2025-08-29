@@ -8,9 +8,9 @@ interface PaginationProps {
 }
 
 export default function Pagination({
- totalPages={totalPages},
-  page={page},
-  setPage={setPage},
+ totalPages,
+  page,
+  setPage,
 }: PaginationProps) {
   return (
     <ReactPaginate
