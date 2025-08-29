@@ -14,7 +14,7 @@ export const fetchNotes = async (
   perPage: number =12,
   search?: string
 ): Promise<NotesResponse> => {
-  const params: Record<string, string | number> = { page: Math.max(1, page), perPage };
+  const params: Record<string, string | number> = { page: Math.max(1,page), perPage };
   if (search) params.search = search;
   const { data } = await axios.get<NotesResponse>("/notes", { params });
   return data;
