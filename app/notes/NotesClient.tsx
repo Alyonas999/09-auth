@@ -18,7 +18,7 @@ const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
   const [debouncedQuery] = useDebounce(query, 300);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
   const [showLoader, setShowLoader] = useState<boolean>(false);
 
   const {
@@ -88,8 +88,6 @@ const NotesClient = () => {
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm
-           
-       
             onSubmit={handleClose}
             onCancel={handleClose}
           />
