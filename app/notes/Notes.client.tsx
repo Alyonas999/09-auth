@@ -12,7 +12,6 @@ import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
 import css from '../notes/NotePage.module.css';
 
-
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
   const [debouncedQuery] = useDebounce(query, 300);
@@ -27,8 +26,8 @@ const NotesClient = () => {
     isFetching,
     error,
   } = useQuery({
-    queryKey: ['notes', query, page],
-    queryFn: () => fetchNotes( page, 12, query ),
+    queryKey: ['notes', debouncedQuery, page], 
+    queryFn: () => fetchNotes(page, 12, debouncedQuery), 
     refetchOnMount: false,
     placeholderData: keepPreviousData,
   });
@@ -74,22 +73,12 @@ const NotesClient = () => {
         <Loading />
       ) : (
         isSuccess &&
-        notes && (
-          <NoteList
-            query={debouncedQuery}
-            
-            notes={notes.notes}
-           
-          />
-        )
+        notes && <NoteList notes={notes.notes} /> 
       )}
 
       {isModalOpen && (
         <Modal onClose={handleClose}>
-          <NoteForm
-            onSubmit={handleClose}
-            onCancel={handleClose}
-          />
+          <NoteForm onClose={handleClose} />
         </Modal>
       )}
 

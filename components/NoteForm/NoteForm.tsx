@@ -8,12 +8,11 @@ import type { Note } from "../../types/note";
 
 export type NoteFormProps = {
   onCancel: () => void;
-  onSubmit: (newNoteData: { title: string; content: string; tag: Note["tag"] }) => void;
 };
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Title is required").min(3, "Must be at least 3 characters"),
-  content: Yup.string().required("Content is required").min(5, "Must be at least 5 characters"),
+  content: Yup.string().max(500, "Must be at most 500 characters"), 
   tag: Yup.mixed<Note["tag"]>().oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"]),
 });
 
@@ -45,7 +44,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
           </div>
 
           <div>
-            <Field as="textarea" name="content" placeholder="Content" />
+            <Field as="textarea" name="content" placeholder="Content (optional)" />
             <ErrorMessage name="content" component="div" className={css.error} />
           </div>
 

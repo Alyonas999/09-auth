@@ -9,7 +9,6 @@ import Link from "next/link";
 
 interface NoteListProps {
   notes: Note[];
-   query: string
 }
 
 export default function NoteList({ notes }: NoteListProps) {
@@ -43,7 +42,7 @@ export default function NoteList({ notes }: NoteListProps) {
             {note.tag && <span className={css.tag}>{note.tag}</span>}
 
             <Link href={`/notes/${note.id}`} className={css.viewLink}>
-           View details
+              View details
             </Link>
 
             <button
