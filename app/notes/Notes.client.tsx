@@ -1,92 +1,67 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useDebounce, useDebouncedCallback } from 'use-debounce';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import NoteList from '@/components/NoteList/NoteList';
-import Modal from '@/components/Modal/Modal';
-import Pagination from '@/components/Pagination/Pagination';
-import SearchBox from '@/components/SearchBox/SearchBox';
-import NoteForm from '@/components/NoteForm/NoteForm';
-import { fetchNotes } from '@/lib/api';
-import Loading from '@/app/loading';
-import { Toaster } from 'react-hot-toast';
-import css from '../notes/NotePage.module.css';
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "@/lib/api";
+import { toast } from "react-hot-toast";
+import css from "./NoteForm.module.css";
 
-const NotesClient = () => {
-  const [query, setQuery] = useState<string>('');
-  const [debouncedQuery] = useDebounce(query, 300);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(1);
-  const [showLoader, setShowLoader] = useState<boolean>(false);
+export interface NoteFormProps {
+  onClose: () => void;  
+}
 
-  const {
-    data: notes,
-    isSuccess,
-    isLoading,
-    isFetching,
-    error,
-  } = useQuery({
-    queryKey: ['notes', debouncedQuery, page], 
-    queryFn: () => fetchNotes(page, 12, debouncedQuery), 
-    refetchOnMount: false,
-    placeholderData: keepPreviousData,
+export default function NoteForm({ onClose }: NoteFormProps) {
+  const queryClient = useQueryClient();
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tag, setTag] = useState("");
+
+  const { mutate: createMutation, isPending } = useMutation({
+    mutationFn: createNote,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      toast.success("Note created");
+      onClose(); 
+    },
+    onError() {
+      toast.error("Failed to create note");
+    },
   });
 
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    if (isLoading || isFetching) {
-      setShowLoader(true);
-    } else if (showLoader) {
-      timeout = setTimeout(() => setShowLoader(false), 300);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [isLoading, isFetching, showLoader]);
-
-  const totalPages = notes?.totalPages ?? 1;
-
-  const onQueryChange = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPage(1);
-      setQuery(e.target.value);
-    },
-    300
-  );
-
-  const handleClose = () => setIsModalOpen(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMutation({ title, content, tag });
+  };
 
   return (
-    <div className={css.app}>
-      <Toaster />
-      <header className={css.toolbar}>
-        <SearchBox onChange={onQueryChange} />
-        {totalPages > 1 && (
-          <Pagination totalPages={totalPages} page={page} setPage={setPage} />
-        )}
-        <button className={css.button} onClick={() => setIsModalOpen(true)}>
-          Create note +
+    <form className={css.form} onSubmit={handleSubmit}>
+      <input
+        className={css.input}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        required
+      />
+      <textarea
+        className={css.textarea}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Content"
+        required
+      />
+      <input
+        className={css.input}
+        value={tag}
+        onChange={(e) => setTag(e.target.value)}
+        placeholder="Tag"
+      />
+      <div className={css.actions}>
+        <button type="submit" className={css.button} disabled={isPending}>
+          {isPending ? "Saving..." : "Save"}
         </button>
-      </header>
-
-      {showLoader ? (
-        <Loading />
-      ) : (
-        isSuccess &&
-        notes && <NoteList notes={notes.notes} /> 
-      )}
-
-      {isModalOpen && (
-        <Modal onClose={handleClose}>
-          <NoteForm onClose={handleClose} />
-        </Modal>
-      )}
-
-      {error && (
-        <p className={css.error}>Could not fetch notes. {error?.message}</p>
-      )}
-    </div>
+        <button type="button" className={css.button} onClick={onClose}>
+          Cancel
+        </button>
+      </div>
+    </form>
   );
-};
-
-export default NotesClient;
+}
