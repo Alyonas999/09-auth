@@ -7,7 +7,7 @@ import { createNote } from "../../lib/api";
 import type { Note } from "../../types/note";
 
 export type NoteFormProps = {
-  onCancel: () => void;
+  onClose: () => void;
 };
 
 const validationSchema = Yup.object({
@@ -16,14 +16,14 @@ const validationSchema = Yup.object({
   tag: Yup.mixed<Note["tag"]>().oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"]),
 });
 
-export default function NoteForm({ onCancel }: NoteFormProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] }); 
-      onCancel(); 
+      onClose(); 
     },
   });
 
@@ -63,7 +63,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
             <button type="submit" disabled={isSubmitting || mutation.isPending}>
               {mutation.isPending ? "Saving..." : "Save"}
             </button>
-            <button type="button" onClick={onCancel}>
+            <button type="button" onClick={onClose}>
               Cancel
             </button>
           </div>
