@@ -8,7 +8,6 @@ import  css from '@/components/NoteForm/NoteForm';
 export interface NoteFormProps {
   onClose: () => void;  
 }
-
 export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
