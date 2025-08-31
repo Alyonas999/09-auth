@@ -16,9 +16,7 @@ export default async function App() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotesClient onClose={function (): void {
-        throw new Error('Function not implemented.');
-      } } />
+      <NotesClient />
     </HydrationBoundary>
   );
 }
