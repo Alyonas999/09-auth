@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "@/lib/api";
 import { toast } from "react-hot-toast";
-import css from "./NoteForm.module.css";
+import css from "@/components/NoteForm/NoteForm.module.css";
 
 export interface NoteFormProps {
   onClose: () => void;  
