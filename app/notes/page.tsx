@@ -16,7 +16,7 @@ export default async function App() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotesClient />
+      <NotesClient/>
     </HydrationBoundary>
   );
 }
