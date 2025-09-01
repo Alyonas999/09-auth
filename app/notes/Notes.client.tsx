@@ -35,7 +35,6 @@ const NotesClient = () => {
   } = useQuery({
     queryKey: ['notes', query, page],
     queryFn: () => fetchNotes(page, 12, query),
-    keepPreviousData: true,
     staleTime: 1000 * 60,
     refetchOnWindowFocus: false,
   });
@@ -67,20 +66,17 @@ const NotesClient = () => {
         isSuccess &&
         notes && (
           <NoteList
-            query={query}
-            page={page}
+          
+          
             notes={notes.notes}
-            isFetching={isFetching}
+         
           />
         )
       )}
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm
-            query={query}
-            page={page}
-            onSubmit={handleClose}
-            onCancel={handleClose}
+            onClose={handleClose}
           />
         </Modal>
       )}
@@ -95,3 +91,5 @@ const NotesClient = () => {
 };
 
 export default NotesClient;
+
+
