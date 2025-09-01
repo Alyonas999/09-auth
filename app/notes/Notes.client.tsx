@@ -11,12 +11,13 @@ import { fetchNotes } from '@/lib/api';
 import Loading from '@/app/loading';
 import { Toaster } from 'react-hot-toast';
 import css from '../notes/NotePage.module.css';
+
 const NotesClient = () => {
   const [query, setQuery] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [showLoader, setShowLoader] = useState<boolean>(false);
- 
+
   const onQueryChange = useDebouncedCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPage(1);
@@ -25,11 +26,17 @@ const NotesClient = () => {
     500
   );
 
-  const { data: notes, isLoading, isFetching, error, isSuccess } = useQuery({
+  const {
+    data: notes,
+    isLoading,
+    isFetching,
+    error,
+    isSuccess,
+  } = useQuery({
     queryKey: ['notes', query, page],
-    queryFn: () => fetchNotes(page, 12, query), 
-    keepPreviousData: true, 
-    staleTime: 1000 * 60,  
+    queryFn: () => fetchNotes(page, 12, query),
+    keepPreviousData: true,
+    staleTime: 1000 * 60,
     refetchOnWindowFocus: false,
   });
 
@@ -38,8 +45,10 @@ const NotesClient = () => {
   } else if (!isLoading && !isFetching && showLoader) {
     setTimeout(() => setShowLoader(false), 300);
   }
+
   const totalPages = notes?.totalPages ?? 1;
   const handleClose = () => setIsModalOpen(false);
+
   return (
     <div className={css.app}>
       <Toaster />
@@ -76,9 +85,13 @@ const NotesClient = () => {
         </Modal>
       )}
       {error && (
-        <p className={css.error}>Could not fetch notes. {(error as any)?.message}</p>
+        <p className={css.error}>
+          Could not fetch notes.{' '}
+          {error instanceof Error ? error.message : 'Unknown error'}
+        </p>
       )}
     </div>
   );
 };
+
 export default NotesClient;
