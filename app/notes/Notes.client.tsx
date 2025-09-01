@@ -4,11 +4,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "@/lib/api";
 import { toast } from "react-hot-toast";
 import css from "@/components/NoteForm/NoteForm.module.css";
+import Modal from '@/components/Modal/Modal';
+import NoteList from '@/components/NoteList/NoteList';
+import SearchBox from '@/components/SearchBox/SearchBox';
+import Pagination from '@/components/Pagination/Pagination';
+import NoteForm from '@/components/NoteForm/NoteForm';
+
 
 export interface NoteFormProps {
   onClose: () => void;  
 }
-export default function NoteForm({ onClose }: NoteFormProps) {
+export default function NoteForm ({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
