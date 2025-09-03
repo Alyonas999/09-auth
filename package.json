@@ -8,14 +8,26 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "paths": {
+      "@/styles/*": [
+        "styles/*"
+      ],
+      "@/components/*": [
+        "components/*"
+      ]
+    }
+  },
   "dependencies": {
     "@tanstack/react-query": "^5.85.5",
     "axios": "^1.11.0",
     "formik": "^2.4.6",
     "framer-motion": "^12.23.12",
-    "next": "15.4.6",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "next": "^15.4.6",
+    "notiflix": "^3.2.8",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-hot-toast": "^2.6.0",
     "react-paginate": "^8.3.0",
     "use-debounce": "^10.0.5",
@@ -23,8 +35,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/node": "^20.19.11",
+    "@types/react": "^19.1.12",
     "@types/react-dom": "^19",
     "@types/react-paginate": "^7.1.4",
     "eslint": "^9",

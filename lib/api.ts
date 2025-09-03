@@ -1,38 +1,60 @@
 import axios from "axios";
 import type { Note, NoteId } from "@/types/note";
 
-export interface NotesResponse {
-  notes: Note[];
-  totalPages: number;
-}
-
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 axios.defaults.headers.common["Authorization"] = `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`;
 
+const Tags = ["All", "Todo", "Work", "Personal", "Meeting", "Shopping"] as const
+
+export type Tags = typeof Tags
+
+type SortBy = "created" | "updated"
+
+interface FetchNotes {
+	notes: Note[]
+	totalPages: number
+}
+
 export const fetchNotes = async (
-  page: number =0,
-  perPage: number =12,
-  search?: string
-): Promise<NotesResponse> => {
-  const params: Record<string, string | number> = { page: Math.max(1,page), perPage };
-  if (search) params.search = search;
-  const { data } = await axios.get<NotesResponse>("/notes", { params });
-  return data;
-};
+	search?: string,
+	page: number = 1,
+	perPage: number = 12,
+	tag?: Exclude<Tags[number], "All">,
+	sortBy?: SortBy
+) => {
+	const { data } = await axios.get<FetchNotes>("notes", {
+		params: {
+			search,
+			page,
+			perPage,
+			tag,
+			sortBy,
+		},
+	})
+	return data
+}
 
 export const createNote = async (
-  newNote: Omit<Note, "id" | "createdAt" | "updatedAt">
+	title: string,
+	content: string,
+	tag: string
 ) => {
-  const { data } = await axios.post<Note>("/notes", newNote);
-  return data;
-};
+	const { data } = await axios.post<Note>("/notes", {
+		title,
+		content,
+		tag,
+	})
+	return data
+}
+
+export const fetchNoteById = async (noteId: NoteId) => {
+	const { data } = await axios.get<Note>(`/notes/${noteId}`)
+	return data
+}
 
 export const deleteNote = async (noteId: NoteId) => {
-  const { data } = await axios.delete<Note>(`/notes/${noteId}`);
-  return data;
-};
+	const { data } = await axios.delete<Note>(`/notes/${noteId}`)
+	return data
+}
 
-export const fetchNoteById = async (noteId: NoteId): Promise<Note> => {
-  const { data } = await axios.get<Note>(`/notes/${noteId}`);
-  return data;
-};
+export const getCategories = Tags
