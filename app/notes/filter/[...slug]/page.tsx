@@ -7,7 +7,8 @@ import { fetchNotes, getCategories, Tags } from "@/lib/api"
 import NotesClient from "./Notes.client"
 
 interface NotesFilterProps {
-	params: { slug: string[] }
+  params: { slug: string[] }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 export const dynamicParams = false
@@ -26,7 +27,7 @@ export default async function NotesFilter({ params }: NotesFilterProps) {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["notes", { search: "", page: 1, category }],
-		queryFn: () => fetchNotes("", 1, undefined, category),
+		queryFn: () => fetchNotes("", 1, category),
 	})
 
 	return (
