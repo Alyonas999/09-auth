@@ -7,21 +7,21 @@ import { fetchNotes, getCategories, Tags } from "@/lib/api"
 import NotesClient from "./Notes.client"
 
 interface NotesFilterProps {
-	params: Promise<{ slug: Tags }>
+	params: { slug: string[] }
 }
 
 export const dynamicParams = false
 export const revalidate = 900
 
 export const generateStaticParams = async () => {
-	const categories = getCategories
+	const categories = await getCategories()
 	return categories.map(category => ({ slug: [category] }))
 }
 
 export default async function NotesFilter({ params }: NotesFilterProps) {
 	const queryClient = new QueryClient()
-	const categories = getCategories
-	const { slug } = await params
+	const categories = await getCategories()
+	const { slug } = params
 	const category = slug[0] === "All" ? undefined : slug[0]
 
 	await queryClient.prefetchQuery({

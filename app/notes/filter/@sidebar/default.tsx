@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import css from './SidebarNotes.module.css';
-import { getCategories } from '@/lib/api';
+import { getCategories, Tags } from '@/lib/api';
 import { Routes } from '@/path/routes';
 
 const SidebarNotes = async () => {
-  const categories = getCategories;
+  const categories: Tags = await getCategories();
 
   return (
     <ul className={css.menuList}>

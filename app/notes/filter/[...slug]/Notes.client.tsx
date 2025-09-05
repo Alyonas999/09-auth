@@ -22,19 +22,22 @@ const NotesClient = ({ categories, category }: NotesClientProps) => {
   const [debouncedQuery] = useDebounce(query, 300);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
+
   const {
     data: notes,
     isSuccess,
     isLoading,
     error,
+     isFetching,
   } = useQuery({
     queryKey: ['notes', { search: debouncedQuery, page, category }],
-    queryFn: () => fetchNotes(debouncedQuery, page, undefined, category),
+    queryFn: () => fetchNotes(debouncedQuery, page, category),
     refetchOnMount: false,
     placeholderData: keepPreviousData,
   });
 
-  const totalPages = notes?.totalPages ?? 1;
+const totalPages = notes?.totalPages ?? 1;
+
   const onQueryChange = useDebouncedCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPage(1);
@@ -63,9 +66,16 @@ const NotesClient = ({ categories, category }: NotesClientProps) => {
           Create note +
         </button>
       </header>
+
       {isSuccess && notes && (
-        <NoteList notes={notes.notes} query={debouncedQuery} page={page} />
+        <NoteList
+          notes={notes.notes}
+          query={debouncedQuery}
+          page={page}
+          isFetching={isFetching}
+        />
       )}
+
       {isModalOpen && (
         <Modal onClose={handleClose}>
           <NoteForm

@@ -5,7 +5,7 @@ import TagsMenu from '../TagsMenu/TagsMenu';
 import { getCategories } from '@/lib/api';
 
 const Header = async () => {
-  const categories = getCategories;
+  const categories = await getCategories ();
 
   return (
     <header className={css.header}>
