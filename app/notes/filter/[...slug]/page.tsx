@@ -3,7 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query"
-import { fetchNotes, getCategories, Tags } from "@/lib/api"
+import { fetchNotes, getCategories } from "@/lib/api"
 import NotesClient from "./Notes.client"
 
 export const dynamicParams = false
@@ -14,13 +14,12 @@ export const generateStaticParams = async () => {
   return categories.map(category => ({ slug: [category] }))
 }
 
-export default async function NotesFilter({
-  params,
-  searchParams,
-}: {
+type NotesPageProps = {
   params: { slug: string[] }
   searchParams?: { [key: string]: string | string[] | undefined }
-}) {
+}
+
+export default async function NotesFilter({ params }: NotesPageProps) {
   const queryClient = new QueryClient()
   const categories = await getCategories()
   const { slug } = params
