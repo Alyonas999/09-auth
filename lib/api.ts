@@ -57,4 +57,7 @@ export const deleteNote = async (noteId: NoteId) => {
 	return data
 }
 
-export const getCategories = Tags
+export const getCategories = async () => {
+	return Tags;
+};
+	
