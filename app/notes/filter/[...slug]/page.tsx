@@ -1,3 +1,4 @@
+
 import {
   dehydrate,
   HydrationBoundary,
@@ -15,7 +16,7 @@ export const generateStaticParams = async () => {
 };
 
 type NotesPageProps = {
-  params: Promise<{ slug: string[] }>;
+  params: { slug: string[] };
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
@@ -23,8 +24,7 @@ export default async function NotesFilter({ params }: NotesPageProps) {
   const queryClient = new QueryClient();
   const categories = await getCategories();
 
-
-  const { slug } = await params;
+  const { slug } = params;
   const category = slug[0] === "All" ? undefined : slug[0];
 
   await queryClient.prefetchQuery({
@@ -34,7 +34,10 @@ export default async function NotesFilter({ params }: NotesPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotesClient categories={categories} category={category} />
+      <NotesClient
+        categories={categories}
+        category={category}
+      />
     </HydrationBoundary>
   );
 }
