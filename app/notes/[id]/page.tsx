@@ -7,11 +7,13 @@ import { fetchNoteById, getSingleNote } from "@/lib/api";
 import NoteDetailsClient from "./NoteDetails.client";
 
 type Props = {
-  params: { id: string };
+  params: { id: string } | Promise<{ id: string }>;
 };
 
+
 export async function generateMetadata({ params }: Props) {
-  const note = await getSingleNote(params.id);
+  const { id } = await Promise.resolve(params); 
+  const note = await getSingleNote(id);
 
   return {
     title: `Note: ${note.title}`,
@@ -19,7 +21,7 @@ export async function generateMetadata({ params }: Props) {
     openGraph: {
       title: `Note: ${note.title}`,
       description: note.content.slice(0, 100),
-      url: `https://notehub.com/notes/${params.id}`,
+      url: `https://notehub.com/notes/${id}`,
       images: [
         {
           url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 const NoteDetails = async ({ params }: Props) => {
-  const { id } = params;
+  const { id } = await Promise.resolve(params); 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
