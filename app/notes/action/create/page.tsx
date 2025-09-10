@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     title: "Create Note",
     description: "Create a new note in NoteHub application",
     url: "https://notehub.com/notes/action/create",
+    siteName: 'NoteHub',
     images: [
       {
         url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
@@ -17,11 +18,12 @@ export const metadata: Metadata = {
         alt: "Create Note",
       },
     ],
-    type: "website",
+    type: "article",
   },
 };
 
 const CreateNote = async () => {
+  
   return (
     <main className={css.main}>
       <div className={css.container}>
