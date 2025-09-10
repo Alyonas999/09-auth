@@ -15,14 +15,16 @@ export const generateStaticParams = async () => {
 };
 
 type NotesPageProps = {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export default async function NotesFilter({ params }: NotesPageProps) {
   const queryClient = new QueryClient();
   const categories = await getCategories();
-  const { slug } = params;
+
+
+  const { slug } = await params;
   const category = slug[0] === "All" ? undefined : slug[0];
 
   await queryClient.prefetchQuery({
