@@ -14,9 +14,11 @@ interface NotesFilterProps {
 export const dynamicParams = false
 export const revalidate = 900
 
-export async function generateMetadata({
-	params,
-}: NotesFilterProps): Promise<Metadata> {
+type generateMetadataProps = {
+  params: Promise<{ slug: string[] }>;
+};
+
+export default async function NotesPage({ params }: generateMetadataProps) {
 	const { slug } = await params
 	const descriptions = {
 		All: `Browse all your notes in one place. Stay organized and access everything instantly with Notehub.`,
@@ -28,10 +30,10 @@ export async function generateMetadata({
 	}
 	return {
 		title: "NoteHub - Share Notes Instantly Online",
-		description: descriptions[slug[0]],
+		description: [slug[0]],
 		openGraph: {
 			title: "NoteHub - Share Notes Instantly Online",
-			description: descriptions[slug[0]],
+			description: [slug[0]],
 			siteName: "NoteHub",
 			type: "website",
 			images: [
@@ -46,7 +48,7 @@ export async function generateMetadata({
 		twitter: {
 			card: "summary_large_image",
 			title: "NoteHub - Share Notes Instantly Online",
-			description: descriptions[slug[0]],
+			description: [slug[0]],
 			images: [
 				{
 					url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
