@@ -5,6 +5,7 @@ import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 
+
 export const metadata: Metadata = {
   title: 'NoteHub',
   description: 'Simple and efficient notes manager',

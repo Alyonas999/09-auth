@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.85.5",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.11.0",
     "formik": "^2.4.6",
     "framer-motion": "^12.23.12",
