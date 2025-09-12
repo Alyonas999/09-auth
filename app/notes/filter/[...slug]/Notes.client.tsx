@@ -3,7 +3,7 @@
 import NoteList from '@/components/NoteList/NoteList';
 import Pagination from '@/components/Pagination/Pagination';
 import SearchBox from '@/components/SearchBox/SearchBox';
-import { fetchNotes, Tags } from '@/lib/api';
+import { fetchNotes, Tags, type Tag } from '@/lib/api'; 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -12,8 +12,8 @@ import Link from 'next/link';
 import css from './NotesClient.module.css';
 
 interface NotesClientProps {
-  categories: Tags;
-  category: Exclude<Tags[number], 'All'> | undefined;
+  categories: typeof Tags;
+  category: Tag | undefined;
 }
 
 const NotesClient = ({ categories, category }: NotesClientProps) => {
@@ -28,8 +28,8 @@ const NotesClient = ({ categories, category }: NotesClientProps) => {
     error,
     isFetching,
   } = useQuery({
-    queryKey: ['notes', { search: debouncedQuery, page, category }],
-    queryFn: () => fetchNotes(debouncedQuery, page),
+    queryKey: ['notes', { search: debouncedQuery, page, tag: category }], 
+    queryFn: () => fetchNotes(debouncedQuery, page, 12, category), 
     refetchOnMount: false,
     placeholderData: keepPreviousData,
   });
