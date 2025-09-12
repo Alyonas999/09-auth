@@ -29,7 +29,7 @@ const NotesClient = ({ categories, category }: NotesClientProps) => {
     isFetching,
   } = useQuery({
     queryKey: ['notes', { search: debouncedQuery, page, category }],
-    queryFn: () => fetchNotes(debouncedQuery, page, category),
+    queryFn: () => fetchNotes(debouncedQuery, page),
     refetchOnMount: false,
     placeholderData: keepPreviousData,
   });

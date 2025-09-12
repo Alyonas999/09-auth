@@ -1,74 +1,85 @@
 import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
-import { fetchNotes, getCategories, Tag } from '@/lib/api';
-import NotesClient from './Notes.client';
-import type { Metadata } from 'next';
+	dehydrate,
+	HydrationBoundary,
+	QueryClient,
+} from "@tanstack/react-query"
+import { fetchNotes, getCategories, Tags } from "@/lib/api"
+import NotesClient from "./Notes.client"
+import { Metadata } from "next"
 
 interface NotesFilterProps {
-  params: Promise<{ slug: Tag[] }>;
+	params: Promise<{ slug: Tags }>
 }
 
-export const dynamicParams = false;
-export const revalidate = 900;
-
-const descriptions: Record<Tag, string> = {
-  All: 'All your notes in one place.',
-  Work: 'Notes for your work projects.',
-  Todo: 'Track your tasks and to-dos.',
-  Personal: 'Your personal notes, safely stored.',
-  Meeting: 'Meeting notes and summaries.',
-  Shopping: 'Your shopping lists organized.',
-};
+export const dynamicParams = false
+export const revalidate = 900
 
 export async function generateMetadata({
-  params,
+	params,
 }: NotesFilterProps): Promise<Metadata> {
-  const { slug } = await params;
-  const tag = slug[0] || 'All';
-
-  return {
-    title: `NoteHub – ${tag} Notes`,
-    description: descriptions[tag] || 'Browse your notes in NoteHub.',
-    openGraph: {
-      title: `NoteHub – ${tag} Notes`,
-      description: descriptions[tag] || 'Browse your notes in NoteHub.',
-      url: `https://08-zustand-puce-seven.vercel.app/notes/filter/${tag}`,
-      images: [
-        {
-          url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
-          width: 1200,
-          height: 630,
-          alt: `NoteHub – ${tag} Notes`,
-        },
-      ],
-      type: 'website',
-      locale: 'en_US',
-    },
-  };
+	const { slug } = await params
+	const descriptions = {
+		All: `Browse all your notes in one place. Stay organized and access everything instantly with Notehub.`,
+		Work: `Manage and share your work notes with ease. Stay productive and organized using Notehub.`,
+		Todo: `Keep track of your tasks and to-dos effortlessly. Notehub helps you stay on top of your list.`,
+		Personal: `Store and organize your personal notes securely. Notehub makes it simple and private.`,
+		Meeting: `Capture and share meeting notes instantly. Stay aligned and productive with Notehub.`,
+		Shopping: `Plan and manage your shopping lists in seconds. Notehub keeps your essentials organized.`,
+	}
+	return {
+		title: "NoteHub - Share Notes Instantly Online",
+		description: descriptions[slug[0]],
+		openGraph: {
+			title: "NoteHub - Share Notes Instantly Online",
+			description: descriptions[slug[0]],
+			siteName: "NoteHub",
+			type: "website",
+			images: [
+				{
+					url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+					width: 1200,
+					height: 630,
+					alt: "NoteHub - Share Notes Instantly Online",
+				},
+			],
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: "NoteHub - Share Notes Instantly Online",
+			description: descriptions[slug[0]],
+			images: [
+				{
+					url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+					width: 1200,
+					height: 630,
+					alt: "NoteHub - Share Notes Instantly Online",
+				},
+			],
+		},
+	}
 }
 
 export const generateStaticParams = async () => {
-  const tags = getCategories();
-  return tags.map((tag) => ({ slug: [tag] }));
-};
+	const categories = await getCategories()
+	return categories.map(category => ({ slug: [category] }))
+}
 
 export default async function NotesFilter({ params }: NotesFilterProps) {
-  const queryClient = new QueryClient();
-  const { slug } = await params;
+	const queryClient = new QueryClient()
+	const { slug } = await params
+	const tag = slug[0] === "All" ? undefined : slug[0]
 
-  const tag = slug[0] === 'All' ? undefined : slug[0];
+	await queryClient.prefetchQuery({
+		queryKey: ["notes", { search: "", page: 1, tag }],
+		queryFn: () => fetchNotes("", 1, tag),
+	})
 
-  await queryClient.prefetchQuery({
-    queryKey: ['notes', { search: '', page: 1, tag }],
-    queryFn: () => fetchNotes('', 1, 12, tag),
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotesClient tag={tag} />
-    </HydrationBoundary>
-  );
+	return (
+		<HydrationBoundary state={dehydrate(queryClient)}>
+		 <NotesClient
+        categories={categories}
+        category={category}
+      />
+		</HydrationBoundary>
+	)
 }
