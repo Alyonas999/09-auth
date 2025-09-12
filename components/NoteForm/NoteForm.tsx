@@ -21,9 +21,9 @@ export default function NoteForm() {
       clearDraft();
       router.back();
     },
-    onError: () => {
+    onError: (error: Error) => {
       Loading.remove();
-      toast.error('Error creating note!');
+      toast.error(`Error creating note: ${error.message}`);
     },
     onMutate: () => {
       Loading.hourglass();
@@ -36,8 +36,11 @@ export default function NoteForm() {
   };
 
   const handleCancel = () => {
-    clearDraft();
     router.back();
+  };
+
+  const handleTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDraft({ ...draft, tag: e.target.value as Tag });
   };
 
   return (
@@ -63,6 +66,7 @@ export default function NoteForm() {
           value={draft.content}
           onChange={(e) => setDraft({ ...draft, content: e.target.value })}
           className={css.textarea}
+          required
           disabled={mutation.isPending}
         />
       </div>
@@ -72,12 +76,12 @@ export default function NoteForm() {
         <select
           id="tag"
           value={draft.tag}
-          onChange={(e) =>
-            setDraft({ ...draft, tag: e.target.value as Tag })
-          }
+          onChange={handleTagChange}
           className={css.select}
+          required
           disabled={mutation.isPending}
         >
+          <option value="">Select a tag</option>
           {Tags.filter((tag) => tag !== 'All').map((tag) => (
             <option key={tag} value={tag}>
               {tag}
@@ -98,9 +102,9 @@ export default function NoteForm() {
         <button 
           type="submit" 
           className={css.submitButton}
-          disabled={mutation.isPending || !draft.title.trim()}
+          disabled={mutation.isPending || !draft.title.trim() || !draft.content.trim() || !draft.tag}
         >
-          {mutation.isPending ? 'Creating...' : 'Create note'}
+          {mutation.isPending ? 'Creating...' : 'Create Note'}
         </button>
       </div>
     </form>
