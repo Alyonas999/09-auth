@@ -1,26 +1,43 @@
 'use client';
-
 import css from './NoteForm.module.css';
-import { createNote, Tags } from '@/lib/api';
+import { createNote, Tags, type Tag } from '@/lib/api';
 import { useNoteDraftStore } from '@/lib/store/noteStore';
 import toast from 'react-hot-toast';
 import { Loading } from 'notiflix';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 export default function NoteForm() {
   const { draft, setDraft, clearDraft } = useNoteDraftStore();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const mutation = useMutation({
+    mutationFn: () => createNote(draft.title, draft.content, draft.tag),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      Loading.remove();
+      toast.success('Note created successfully!');
+      clearDraft();
+      router.back();
+    },
+    onError: () => {
+      Loading.remove();
+      toast.error('Error creating note!');
+    },
+    onMutate: () => {
+      Loading.hourglass();
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      Loading.hourglass();
-      await createNote(draft.title, draft.content, draft.tag);
-      Loading.remove();
-      toast.success('Note created!');
-      clearDraft(); 
-    } catch {
-      Loading.remove();
-      toast.error('Error, creating note!');
-    }
+    mutation.mutate();
+  };
+
+  const handleCancel = () => {
+    clearDraft();
+    router.back();
   };
 
   return (
@@ -34,6 +51,7 @@ export default function NoteForm() {
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           className={css.input}
           required
+          disabled={mutation.isPending}
         />
       </div>
 
@@ -45,6 +63,7 @@ export default function NoteForm() {
           value={draft.content}
           onChange={(e) => setDraft({ ...draft, content: e.target.value })}
           className={css.textarea}
+          disabled={mutation.isPending}
         />
       </div>
 
@@ -54,9 +73,10 @@ export default function NoteForm() {
           id="tag"
           value={draft.tag}
           onChange={(e) =>
-            setDraft({ ...draft, tag: e.target.value as typeof draft.tag })
+            setDraft({ ...draft, tag: e.target.value as Tag })
           }
           className={css.select}
+          disabled={mutation.isPending}
         >
           {Tags.filter((tag) => tag !== 'All').map((tag) => (
             <option key={tag} value={tag}>
@@ -67,8 +87,20 @@ export default function NoteForm() {
       </div>
 
       <div className={css.actions}>
-        <button type="submit" className={css.submitButton}>
-          Create note
+        <button 
+          type="button" 
+          onClick={handleCancel}
+          className={css.cancelButton}
+          disabled={mutation.isPending}
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          className={css.submitButton}
+          disabled={mutation.isPending || !draft.title.trim()}
+        >
+          {mutation.isPending ? 'Creating...' : 'Create note'}
         </button>
       </div>
     </form>
