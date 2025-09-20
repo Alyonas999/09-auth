@@ -1,29 +1,27 @@
-import css from "./CreateNote.module.css";
-import type { Metadata } from "next";
-import NoteForm from "@/components/NoteForm/NoteForm";
+import { NoteForm } from '@/components/NoteForm/NoteForm';
+import css from './CreateNote.module.css';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Create Note",
-  description: "Create a new note in NoteHub application",
+  title: 'NoteHub - Create Note',
+  description: 'Create and save your new note quickly and easily.',
   openGraph: {
-    title: "Create Note",
-    description: "Create a new note in NoteHub application",
-    url: "https://notehub.com/notes/action/create",
+    title: 'NoteHub - Create Note',
+    description: 'Create and save your new note quickly and easily.',
+    url: 'https://08-zustand-puce-seven.vercel.app/notes/action/create',
     siteName: 'NoteHub',
     images: [
       {
-        url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+        url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
         width: 1200,
         height: 630,
-        alt: "Create Note",
+        alt: 'Create a new note on NoteHub',
       },
     ],
-    type: "article",
+    type: 'article',
   },
 };
-
-const CreateNote = async () => {
-  
+const CreateNote = () => {
   return (
     <main className={css.main}>
       <div className={css.container}>
@@ -33,5 +31,4 @@ const CreateNote = async () => {
     </main>
   );
 };
-
 export default CreateNote;
