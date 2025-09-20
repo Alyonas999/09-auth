@@ -1,36 +1,55 @@
 'use client';
 
-import { Routes } from '@/path/routes';
+import { useEffect, useRef, useState } from 'react';
 import css from './TagsMenu.module.css';
-import { Tags } from '@/lib/api/api';
 import Link from 'next/link';
-import { useState } from 'react';
+export default function TagsMenu() {
+  const categories = ['All', 'Work', 'Personal', 'Meeting', 'Shopping', 'Todo'];
+  const [isOpenMenu, setIsOpenMenu] = useState(false);
 
-interface TagsMenuProps {
-  categories: Tags;
-}
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
 
-const TagsMenu = ({ categories }: TagsMenuProps) => {
-  const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
-
-  const handleClick = () => {
-    setIsNotesOpen(!isNotesOpen);
+  const toggleMenu = () => {
+    setIsOpenMenu(prev => !prev);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !buttonRef.current?.contains(event.target as Node)
+      ) {
+        setIsOpenMenu(false);
+      }
+    };
+
+    if (isOpenMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpenMenu]);
+  const handleLinkClick = () => {
+    setIsOpenMenu(false);
+  };
   return (
     <div className={css.menuContainer}>
-      <button className={css.menuButton} onClick={handleClick}>
-        Notes {isNotesOpen ? '▾' : '▴'}
+      <button ref={buttonRef} onClick={toggleMenu} className={css.menuButton}>
+        {isOpenMenu ? 'Notes ▴' : 'Notes ▾'}
       </button>
-      {isNotesOpen && categories && (
-        <ul className={css.menuList}>
-          {categories.map((category) => (
+      {isOpenMenu && (
+        <ul ref={menuRef} className={css.menuList}>
+          {categories.map(category => (
             <li key={category} className={css.menuItem}>
               <Link
-                href={Routes.NotesFilter + category}
-                scroll={false}
+                href={`/notes/filter/${category}`}
                 className={css.menuLink}
-                onClick={() => setIsNotesOpen(false)}
+                onClick={handleLinkClick}
               >
                 {category}
               </Link>
@@ -40,6 +59,4 @@ const TagsMenu = ({ categories }: TagsMenuProps) => {
       )}
     </div>
   );
-};
-
-export default TagsMenu;
+}
