@@ -1,93 +1,65 @@
-'use client';
-
-import { motion, Variants } from 'framer-motion';
-import css from './NoteList.module.css';
-import type { Note } from '../../types/user';
-import { deleteNote } from '@/lib/api/api';
-import { toast } from 'react-hot-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Note } from '../../types/note';
+import css from './NoteList.module.css';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { Routes } from '@/path/routes';
+import { deleteNote } from '@/lib/api/clientApi';
+import { motion } from 'framer-motion';
 
 interface NoteListProps {
-  query: string;
-  page: number;
   notes: Note[];
-  isFetching?: boolean;
 }
 
-const containerVariants: Variants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, x: -50 },
-  show: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      type: 'spring',
-      stiffness: 100,
-      damping: 15,
-    },
-  },
-  exit: {
-    opacity: 0,
-    x: 50,
-    transition: { duration: 0.2 },
-  },
-};
-
-export default function NoteList({ notes, query, page }: NoteListProps) {
+export function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
-  const noteDeletion = useMutation({
-    mutationFn: async (id: string) => await deleteNote(id),
-    onSuccess: () => {
-      toast.success('Note has been successfully deleted!');
-      queryClient.invalidateQueries({ queryKey: ['notes', query, page] });
+  const mutationDelete = useMutation({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: data => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      toast.success(`Note "${data.title}" deleted.`);
     },
     onError: () => {
-      toast.error('Error occurred while deleting note!');
+      toast.error(`Failed to delete note.`);
     },
   });
 
-  const onDelete = (id: string) => noteDeletion.mutate(id);
+  const handleClickDelete = (id: string) => {
+    mutationDelete.mutate(id);
+  };
 
-  if (!notes || notes.length === 0) {
-    return <p className={css.empty}>No notes found.</p>;
-  }
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.1 }, // задержка между появлением заметок
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+  };
 
   return (
     <motion.ul
       className={css.list}
       variants={containerVariants}
       initial="hidden"
-      animate="show"
+      animate="visible"
     >
-      {notes.map((note) => (
-        <motion.li
-          key={note.id}
-          className={css.listItem}
-          variants={itemVariants}
-          whileHover={{
-            scale: 1.02,
-            boxShadow: '0 6px 18px rgba(0,0,0,0.15)',
-          }}
-        >
-          <h2 className={css.title}>{note.title}</h2>
-          <p className={css.content}>{note.content}</p>
+      {notes.map(({ title, tag, id, content }) => (
+        <motion.li key={id} className={css.listItem} variants={itemVariants}>
+          <h2 className={css.title}>{title}</h2>
+          <p className={css.content}>{content}</p>
           <div className={css.footer}>
-            <span className={css.tag}>{note.tag}</span>
-            <Link className={css.tag} href={Routes.NoteDetails + note.id}>
+            <span className={css.tag}>{tag}</span>
+            <Link className={css.link} href={`/notes/${id}`}>
               View details
             </Link>
-            <button className={css.button} onClick={() => onDelete(note.id)}>
+            <button
+              className={css.button}
+              onClick={() => handleClickDelete(id)}
+            >
               Delete
             </button>
           </div>
