@@ -1,20 +1,13 @@
 import Link from 'next/link';
 import css from './SidebarNotes.module.css';
-import { getCategories, Tags } from '@/lib/api/api';
-import { Routes } from '@/path/routes';
 
-const SidebarNotes = async () => {
-  const categories: Tags = await getCategories();
-
+const NotesSidebar = async () => {
+  const categories = ['All', 'Work', 'Personal', 'Meeting', 'Shopping', 'Todo'];
   return (
     <ul className={css.menuList}>
-      {categories.map((category) => (
+      {categories.map(category => (
         <li key={category} className={css.menuItem}>
-          <Link
-            href={Routes.NotesFilter + category}
-            scroll={false}
-            className={css.menuLink}
-          >
+          <Link href={`/notes/filter/${category}`} className={css.menuLink}>
             {category}
           </Link>
         </li>
@@ -23,4 +16,4 @@ const SidebarNotes = async () => {
   );
 };
 
-export default SidebarNotes;
+export default NotesSidebar;
