@@ -2,7 +2,7 @@
 
 import { Routes } from '@/path/routes';
 import css from './TagsMenu.module.css';
-import { Tags } from '@/lib/api';
+import { Tags } from '@/lib/api/api';
 import Link from 'next/link';
 import { useState } from 'react';
 

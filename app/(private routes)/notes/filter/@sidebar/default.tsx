@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import css from './SidebarNotes.module.css';
-import { getCategories, Tags } from '@/lib/api';
+import { getCategories, Tags } from '@/lib/api/api';
 import { Routes } from '@/path/routes';
 
 const SidebarNotes = async () => {

@@ -4,7 +4,7 @@ import './globals.css';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
-
+import AuthProvider from '@/components/AuthProvider/AuthProvider';
 
 export const metadata: Metadata = {
   title: 'NoteHub',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'NoteHub',
     description: 'Simple and efficient notes manager',
-    url: 'https://notehub.com',
+    url: 'https://09-auth-mu-nine.vercel.app/',
     images: [
       {
         url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
@@ -43,12 +43,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.variable}>
         <TanStackProvider>
+          <AuthProvider> 
           <Header />
           <main>
             {children}
             {modal}
           </main>
-          <Footer />
+            <Footer />
+             </AuthProvider>
         </TanStackProvider>
       </body>
     </html>

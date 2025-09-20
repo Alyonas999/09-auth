@@ -1,6 +1,6 @@
 'use client';
 import css from './NoteForm.module.css';
-import { createNote, Tags, type Tag } from '@/lib/api';
+import { createNote, Tags, type Tag } from '@/lib/api/api';
 import { useNoteDraftStore } from '@/lib/store/noteStore';
 import toast from 'react-hot-toast';
 import { Loading } from 'notiflix';

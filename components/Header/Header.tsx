@@ -1,25 +1,25 @@
-import Link from 'next/link';
-import css from './Header.module.css';
-import { Routes } from '@/path/routes';
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
 import TagsMenu from '../TagsMenu/TagsMenu';
-import { getCategories } from '@/lib/api';
+import css from './Header.module.css';
+import Link from 'next/link';
 
-const Header = async () => {
-  const categories = await getCategories();
-
+const Header = () => {
   return (
     <header className={css.header}>
-      <Link href={Routes.Home} aria-label="Home">
+      <Link className={css.headerLink} href="/" aria-label="Home">
         NoteHub
       </Link>
       <nav aria-label="Main Navigation">
         <ul className={css.navigation}>
-          <li>
-            <Link href={Routes.Home}>Home</Link>
+          <li className={css.navigationItem}>
+            <Link className={css.navigationLink} href="/">
+              Home
+            </Link>
           </li>
-          <li>
-            <TagsMenu categories={categories} />
+          <li className={css.navigationItem}>
+            <TagsMenu />
           </li>
+          <AuthNavigation />
         </ul>
       </nav>
     </header>
