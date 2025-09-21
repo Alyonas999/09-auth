@@ -1,5 +1,5 @@
 'use client';
-import type { Note } from "../../types/user";
+import type { Note } from "../../types/note";
 import css from "./NoteDetails.module.css";
 
 interface NoteDetailsProps {
