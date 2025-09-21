@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { api, ApiError } from "../../api";
+import { api } from "../../api";
 import { cookies } from "next/headers";
 import { parse } from "cookie";
 import { isAxiosError } from "axios";
