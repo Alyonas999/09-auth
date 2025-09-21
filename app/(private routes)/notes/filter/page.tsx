@@ -20,7 +20,7 @@ export default async function NotesPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotesClient categories={categories} category={category} />
+      <NotesClient initialData={initialData} initialTag={category}/>
     </HydrationBoundary>
   );
 }
