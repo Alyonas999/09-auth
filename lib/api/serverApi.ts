@@ -29,6 +29,28 @@ interface NotesHttpResponse {
   totalPages: number;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  count: number;
+}
+
+export const getCategories = async (): Promise<Category[]> => {
+  const cookieStore = await cookies();
+
+  try {
+    const response = await nextServer.get<Category[]>("/notes/categories", {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    throw error;
+  }
+};
+
 export const fetchNotes = async (
   search: string,
   page: number,
