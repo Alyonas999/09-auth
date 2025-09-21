@@ -6,6 +6,7 @@ type Props = {
   params: Promise<{ slug: string[] }>;
 };
 
+  
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
