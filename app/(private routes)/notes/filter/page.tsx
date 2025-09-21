@@ -9,12 +9,16 @@ import NotesClient from "../filter/[...slug]/Notes.client";
 export default async function NotesPage() {
   const queryClient = new QueryClient();
   
+  await queryClient.prefetchQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
 
-  const categories = await getCategories();
   const category = undefined;
+  const initialData = await fetchNotes("", 1, category);
 
   await queryClient.prefetchQuery({
-    queryKey: ["notes", { search: "", page: 1, tag: category }], 
+    queryKey: ["notes", "", 1, category], 
     queryFn: () => fetchNotes("", 1, category), 
   });
 
