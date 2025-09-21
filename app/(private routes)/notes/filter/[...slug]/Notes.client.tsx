@@ -1,19 +1,19 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { SearchBox } from '@/components/SearchBox/SearchBox';
 import Pagination from '@/components/Pagination/Pagination';
 import Loading from '@/app/loading';
-import { NoteList } from '@/components/NoteList/NoteList';
 import { ErrorMessage } from '@/components/ErrorMessage/ErrorMessage';
+import { ErrorMessageEmpty } from '@/components/ErrorMessageEmpty/ErrorMessageEmpty';
+import { NoteList } from '@/components/NoteList/NoteList';
 import { fetchNotes } from '@/lib/api/clientApi';
-import { SearchBox } from '@/components/SearchBox/SearchBox';
 import { Note } from '@/types/note';
-import {ErrorMessageEmpty} from '@/components/ErrorMessageEmpty/ErrorMessageEmpty';
 import css from './NotesPage.module.css';
 
 interface NotesClientProps {
